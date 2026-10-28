@@ -1,0 +1,6 @@
+repository: https://helm.releases.hashicorp.com
+chart: vault
+version: 0.34.1
+serverVersion: 2.2.1
+sha256: df4c37fac32496892ff1e1d6fd7954d3a402cc7b1b2b4c2226af11b8a57564c4
+image: docker.io/hashicorp/vault:2.2.1@sha256:962a92876e168d68eaaa24b0b8b49bbce1cb63024060a67bba95cd158a366fc2

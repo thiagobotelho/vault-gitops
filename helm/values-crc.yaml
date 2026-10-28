@@ -1,0 +1,82 @@
+global:
+  openshift: true
+  tlsDisable: false
+injector:
+  enabled: false
+server:
+  image:
+    repository: docker.io/hashicorp/vault
+    tag: 2.2.1@sha256:962a92876e168d68eaaa24b0b8b49bbce1cb63024060a67bba95cd158a366fc2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  logFormat: json
+  standalone:
+    enabled: false
+  ha:
+    enabled: true
+    replicas: 1
+    raft:
+      enabled: true
+      setNodeId: true
+      config: "ui = true\ndisable_mlock = true\nlistener \"tcp\" {\n  address = \"\
+        [::]:8200\"\n  cluster_address = \"[::]:8201\"\n  tls_cert_file = \"/vault/tls/tls.crt\"\
+        \n  tls_key_file = \"/vault/tls/tls.key\"\n  telemetry { unauthenticated_metrics_access\
+        \ = true }\n}\nstorage \"raft\" { path = \"/vault/data\" }\nservice_registration\
+        \ \"kubernetes\" {}\ntelemetry {\n  prometheus_retention_time = \"60s\"\n\
+        \  disable_hostname = true\n}\n"
+    disruptionBudget:
+      enabled: false
+  dataStorage:
+    enabled: true
+    size: 5Gi
+  auditStorage:
+    enabled: true
+    size: 1Gi
+  service:
+    annotations:
+      service.beta.openshift.io/serving-cert-secret-name: vault-tls
+    publishNotReadyAddresses: true
+  route:
+    enabled: false
+  extraEnvironmentVars:
+    VAULT_CACERT: /vault/ca/service-ca.crt
+  volumes:
+  - name: vault-tls
+    secret:
+      secretName: vault-tls
+  - name: service-ca
+    configMap:
+      name: vault-service-ca
+  volumeMounts:
+  - name: vault-tls
+    mountPath: /vault/tls
+    readOnly: true
+  - name: service-ca
+    mountPath: /vault/ca
+    readOnly: true
+  readinessProbe:
+    enabled: true
+    path: /v1/sys/health?standbyok=true
+  livenessProbe:
+    enabled: true
+    path: /v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204
+  statefulSet:
+    securityContext:
+      pod:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      container:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+ui:
+  enabled: false
+csi:
+  enabled: false

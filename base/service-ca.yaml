@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-service-ca
+  namespace: vault
+  annotations:
+    service.beta.openshift.io/inject-cabundle: 'true'
+    argocd.argoproj.io/sync-wave: '1'
