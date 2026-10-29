@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vault
+resources:
+- namespace.yaml
+- service-ca.yaml
+- vault-rendered.yaml
+- route.yaml
+- networkpolicy.yaml
+- monitor.yaml
+- operator-account.yaml

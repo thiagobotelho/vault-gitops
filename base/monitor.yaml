@@ -1,0 +1,26 @@
+apiVersion: monitoring.rhobs/v1
+kind: ServiceMonitor
+metadata:
+  name: vault
+  namespace: vault
+  labels:
+    observability: platform
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+      vault-active: 'true'
+  endpoints:
+  - port: https
+    scheme: https
+    path: /v1/sys/metrics
+    params:
+      format:
+      - prometheus
+    tlsConfig:
+      ca:
+        configMap:
+          name: vault-service-ca
+          key: service-ca.crt
+      serverName: vault.vault.svc
+    interval: 30s
